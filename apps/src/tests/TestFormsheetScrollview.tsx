@@ -1,4 +1,4 @@
-import { NavigationContainer, useNavigation } from '@react-navigation/native'
+import { CommonActions, NavigationContainer, useNavigation } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
 
@@ -7,29 +7,43 @@ import { ScrollView, Text, StyleSheet, Button } from 'react-native'
 const styles = StyleSheet.create({
   scrollview: {
     borderWidth: 2,
-    borderColor: 'blue',
+    borderColor: 'blue'
   },
+  contentContainer: {
+    padding: 16
+  }
 });
 
 const FormsheetScreen = () => {
   const navigation = useNavigation()
-  return <ScrollView style={[styles.scrollview, {height: 300}]}>
+  return <ScrollView style={[styles.scrollview]} contentContainerStyle={styles.contentContainer}>
     <Text>Formsheet with scrollview</Text>
     <Button title="Go to Regular screen" onPress={() => {
-      navigation.navigate('Regular')
+            navigation.dispatch(state => {
+        // Remove the Formsheet screen from the stack
+        const routes = state.routes.filter(r => r.name !== 'Formsheet');
+        // Add the Regular screen
+        routes.push({ name: 'Regular', params: {} });
+        
+        return CommonActions.reset({
+          ...state,
+          routes,
+          index: routes.length - 1,
+        });
+      });
     }} />
   </ScrollView>
 }
 
 const RegularScreen = () => {
-  return <ScrollView style={styles.scrollview}>
+  return <ScrollView style={styles.scrollview} contentContainerStyle={styles.contentContainer}>
     <Text>Regular screen with scrollview</Text>
   </ScrollView>
 }
 
 const HomeScreen = () => {
   const navigation = useNavigation()
-  return <ScrollView style={styles.scrollview}>
+  return <ScrollView style={styles.scrollview} contentContainerStyle={styles.contentContainer}>
     <Text>Home Screen</Text>
     <Button title="Open formsheet" onPress={() => {
       navigation.navigate('Formsheet')
