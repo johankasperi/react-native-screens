@@ -1,4 +1,4 @@
-import { CommonActions, NavigationContainer, useNavigation } from '@react-navigation/native'
+import { CommonActions, NavigationContainer, useLinkTo, useNavigation } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import React from 'react'
 
@@ -15,22 +15,12 @@ const styles = StyleSheet.create({
 });
 
 const FormsheetScreen = () => {
+  const linkTo = useLinkTo()
   const navigation = useNavigation()
   return <ScrollView style={[styles.scrollview]} contentContainerStyle={styles.contentContainer}>
     <Text>Formsheet with scrollview</Text>
     <Button title="Go to Regular screen" onPress={() => {
-            navigation.dispatch(state => {
-        // Remove the Formsheet screen from the stack
-        const routes = state.routes.filter(r => r.name !== 'Formsheet');
-        // Add the Regular screen
-        routes.push({ name: 'Regular', params: {} });
-        
-        return CommonActions.reset({
-          ...state,
-          routes,
-          index: routes.length - 1,
-        });
-      });
+      linkTo('/regular')
     }} />
   </ScrollView>
 }
@@ -50,18 +40,47 @@ const HomeScreen = () => {
     }} />
   </ScrollView>
 }
+const NestedStack = createNativeStackNavigator()
+
+const NestedStackScreen = () => {
+  const Stack = createNativeStackNavigator()
+  return (
+    <NestedStack.Navigator>
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Regular" component={RegularScreen} />
+    </NestedStack.Navigator>
+  )
+}
+
 
 const Stack = createNativeStackNavigator()
 
-function App() {
+const linking = {
+  prefixes: ["test-formsheet-scrollview://"],
+  config: {
+    screens: {
+      Formsheet: 'formsheet',
+      NestedStack: {
+        screens: {
+          Regular: {
+            exact: true,
+            path: 'regular'
+          },
+          Home: ''
+        }
+      }
 
+    }
+  }
+}
+
+function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator
-        initialRouteName="Home">
-        <Stack.Screen name="Home" component={HomeScreen} />
+        initialRouteName="NestedStack">
+        <Stack.Screen name="NestedStack" component={NestedStackScreen} options={{headerShown: false}} />
         <Stack.Screen name="Formsheet" component={FormsheetScreen} options={{presentation: "formSheet", sheetAllowedDetents: "fitToContents", headerShown: false}} />
-        <Stack.Screen name="Regular" component={RegularScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
