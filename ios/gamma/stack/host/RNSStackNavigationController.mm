@@ -64,6 +64,7 @@
 
   for (RNSPushOperation *op in _pendingPushOperations) {
     UIViewController *controller = static_cast<UIViewController *>(op.stackScreen.controller);
+    [self maybeConfigureZoomTransitionForPushedController:controller fromController:self.topViewController];
     [self pushViewController:controller animated:YES];
   }
 
@@ -73,6 +74,38 @@
 
   [_pendingPopOperations removeAllObjects];
   [_pendingPushOperations removeAllObjects];
+}
+
+#pragma mark - Zoom transition
+
+/**
+ * If the screen being pushed *from* (`sourceController`) has a registered zoom transition
+ * source view, configure the pushed controller to use UIKit's zoom transition out of that view.
+ * Available on iOS 18+; on older versions this is a no-op and the default push animation is used.
+ */
+- (void)maybeConfigureZoomTransitionForPushedController:(UIViewController *)pushedController
+                                         fromController:(nullable UIViewController *)sourceController
+{
+  if (@available(iOS 18.0, *)) {
+    if (![sourceController isKindOfClass:RNSStackScreenController.class]) {
+      return;
+    }
+
+    RNSStackScreenController *sourceScreenController = static_cast<RNSStackScreenController *>(sourceController);
+    if (sourceScreenController.zoomTransitionSourceView == nil) {
+      return;
+    }
+
+    pushedController.preferredTransition = [UIViewControllerTransition
+           zoomWithOptions:nil
+        sourceViewProvider:^UIView *_Nullable(UIZoomTransitionSourceViewProviderContext *context) {
+          UIViewController *resolvedSource = context.sourceViewController;
+          if ([resolvedSource isKindOfClass:RNSStackScreenController.class]) {
+            return static_cast<RNSStackScreenController *>(resolvedSource).zoomTransitionSourceView;
+          }
+          return nil;
+        }];
+  }
 }
 
 #pragma mark - Layout

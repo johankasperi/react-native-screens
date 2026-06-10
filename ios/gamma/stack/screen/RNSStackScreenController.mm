@@ -24,6 +24,11 @@
   return [_screenView reactEventEmitter];
 }
 
+- (void)registerZoomTransitionSourceView:(UIView *)view
+{
+  _zoomTransitionSourceView = view;
+}
+
 #pragma mark - Lifecycle Events
 
 - (void)viewWillAppear:(BOOL)animated

@@ -194,6 +194,9 @@
         "RNSStackScreen": {
           "className": "RNSStackScreenComponentView"
         },
+        "RNSZoomTransitionSource": {
+          "className": "RNSZoomTransitionSourceComponentView"
+        },
         "RNSStackHost": {
           "className": "RNSStackHostComponentView"
         },
