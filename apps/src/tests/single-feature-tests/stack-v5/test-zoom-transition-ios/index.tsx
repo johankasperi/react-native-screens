@@ -78,8 +78,13 @@ function DetailScreen() {
   return (
     <View style={[styles.detail, { backgroundColor: Colors.GreenLight100 }]}>
       <Text style={styles.label}>Detail</Text>
-      <Text style={styles.label}>Swipe down to zoom back, or use the button.</Text>
-      <Button title="Go back" onPress={() => navigation.pop(navigation.routeKey)} />
+      <Text style={styles.label}>
+        Swipe down to zoom back, or use the button.
+      </Text>
+      <Button
+        title="Go back"
+        onPress={() => navigation.pop(navigation.routeKey)}
+      />
     </View>
   );
 }
