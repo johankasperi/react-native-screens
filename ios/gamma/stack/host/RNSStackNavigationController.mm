@@ -64,7 +64,9 @@
 
   for (RNSPushOperation *op in _pendingPushOperations) {
     UIViewController *controller = static_cast<UIViewController *>(op.stackScreen.controller);
-    [self maybeConfigureZoomTransitionForPushedController:controller fromController:self.topViewController];
+    [self maybeConfigureZoomTransitionForPushedController:controller
+                                           fromController:self.topViewController
+                                                  withTag:op.stackScreen.zoomTransitionSourceTag];
     [self pushViewController:controller animated:YES];
   }
 
@@ -79,20 +81,27 @@
 #pragma mark - Zoom transition
 
 /**
- * If the screen being pushed *from* (`sourceController`) has a registered zoom transition
- * source view, configure the pushed controller to use UIKit's zoom transition out of that view.
- * Available on iOS 18+; on older versions this is a no-op and the default push animation is used.
+ * If the pushed screen has a `zoomTransitionSourceTag` (`tag`) and the screen being pushed *from*
+ * (`sourceController`) has a zoom transition source view registered under that tag, configure the
+ * pushed controller to use UIKit's zoom transition out of that view. When `tag` is `nil` or no
+ * source matches it, the default stack push transition is used. Available on iOS 18+; on older
+ * versions this is a no-op and the default push animation is used.
  */
 - (void)maybeConfigureZoomTransitionForPushedController:(UIViewController *)pushedController
                                          fromController:(nullable UIViewController *)sourceController
+                                                withTag:(nullable NSString *)tag
 {
   if (@available(iOS 18.0, *)) {
+    if (tag == nil) {
+      return;
+    }
+
     if (![sourceController isKindOfClass:RNSStackScreenController.class]) {
       return;
     }
 
     RNSStackScreenController *sourceScreenController = static_cast<RNSStackScreenController *>(sourceController);
-    if (sourceScreenController.zoomTransitionSourceView == nil) {
+    if ([sourceScreenController zoomTransitionSourceViewForTag:tag] == nil) {
       return;
     }
 
@@ -101,7 +110,7 @@
         sourceViewProvider:^UIView *_Nullable(UIZoomTransitionSourceViewProviderContext *context) {
           UIViewController *resolvedSource = context.sourceViewController;
           if ([resolvedSource isKindOfClass:RNSStackScreenController.class]) {
-            return static_cast<RNSStackScreenController *>(resolvedSource).zoomTransitionSourceView;
+            return [static_cast<RNSStackScreenController *>(resolvedSource) zoomTransitionSourceViewForTag:tag];
           }
           return nil;
         }];

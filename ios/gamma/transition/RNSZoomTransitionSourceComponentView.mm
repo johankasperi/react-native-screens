@@ -11,6 +11,10 @@ namespace react = facebook::react;
 @implementation RNSZoomTransitionSourceComponentView {
   BOOL _hasAttemptedRegistration;
   NSString *_Nullable _transitionTag;
+  // The screen the source is registered with and the tag it is registered under, kept so we can
+  // re-register if `transitionTag` changes after the initial registration.
+  __weak RNSStackScreenComponentView *_Nullable _registeredStackScreen;
+  NSString *_Nullable _registeredTag;
 }
 
 - (instancetype)initWithFrame:(CGRect)frame
@@ -27,6 +31,8 @@ namespace react = facebook::react;
 {
   [self resetProps];
   _hasAttemptedRegistration = NO;
+  _registeredStackScreen = nil;
+  _registeredTag = nil;
 }
 
 - (void)resetProps
@@ -60,7 +66,27 @@ namespace react = facebook::react;
     return;
   }
 
-  [stackScreen.controller registerZoomTransitionSourceView:self];
+  [stackScreen.controller registerZoomTransitionSourceView:self forTag:_transitionTag];
+  _registeredStackScreen = stackScreen;
+  _registeredTag = _transitionTag;
+}
+
+// Re-registers the source under the current `transitionTag` if it changed after the initial
+// registration, clearing the previous tag so it no longer resolves to this view.
+- (void)maybeReregisterAfterTagChange
+{
+  if (!_hasAttemptedRegistration) {
+    return;
+  }
+
+  RNSStackScreenComponentView *stackScreen = _registeredStackScreen;
+  if (stackScreen == nil) {
+    return;
+  }
+
+  [stackScreen.controller unregisterZoomTransitionSourceView:self forTag:_registeredTag];
+  [stackScreen.controller registerZoomTransitionSourceView:self forTag:_transitionTag];
+  _registeredTag = _transitionTag;
 }
 
 #pragma mark - Override
@@ -78,7 +104,13 @@ namespace react = facebook::react;
 {
   const auto &newComponentProps = *std::static_pointer_cast<const react::RNSZoomTransitionSourceProps>(props);
 
-  _transitionTag = RCTNSStringFromStringNilIfEmpty(newComponentProps.transitionTag);
+  NSString *newTransitionTag = RCTNSStringFromStringNilIfEmpty(newComponentProps.transitionTag);
+  BOOL tagChanged = !(_transitionTag == newTransitionTag || [_transitionTag isEqualToString:newTransitionTag]);
+  _transitionTag = newTransitionTag;
+
+  if (tagChanged) {
+    [self maybeReregisterAfterTagChange];
+  }
 
   [super updateProps:props oldProps:oldProps];
 }

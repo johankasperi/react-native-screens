@@ -22,6 +22,7 @@ function StackScreen({
   onNativeDismissPrevented,
   // Configuration
   preventNativeDismiss,
+  zoomTransitionSourceTag,
 }: StackScreenProps) {
   const onDismissWrapper = React.useCallback(
     (event: OnDismissEvent) => {
@@ -54,7 +55,8 @@ function StackScreen({
       onDismiss={onDismissWrapper}
       onNativeDismissPrevented={onNativeDismissPrevented}
       // Configuration
-      preventNativeDismiss={preventNativeDismiss}>
+      preventNativeDismiss={preventNativeDismiss}
+      zoomTransitionSourceTag={zoomTransitionSourceTag}>
       {children}
     </StackScreenNativeComponent>
   );

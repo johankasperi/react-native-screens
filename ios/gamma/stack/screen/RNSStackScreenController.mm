@@ -8,6 +8,8 @@
 
 @implementation RNSStackScreenController {
   RNSStackScreenComponentView *_Nonnull _screenView;
+  // Maps a `transitionTag` to the weakly-held source view registered under it.
+  NSMapTable<NSString *, UIView *> *_Nonnull _zoomTransitionSourceViews;
 }
 
 - (instancetype)initWithComponentView:(RNSStackScreenComponentView *)componentView
@@ -15,6 +17,7 @@
   if (self = [super initWithNibName:nil bundle:nil]) {
     _screenView = componentView;
     _headerCoordinator = [[RNSStackScreenHeaderCoordinator alloc] initWithScreenController:self];
+    _zoomTransitionSourceViews = [NSMapTable strongToWeakObjectsMapTable];
   }
   return self;
 }
@@ -24,9 +27,30 @@
   return [_screenView reactEventEmitter];
 }
 
-- (void)registerZoomTransitionSourceView:(UIView *)view
+- (void)registerZoomTransitionSourceView:(UIView *)view forTag:(nullable NSString *)tag
 {
-  _zoomTransitionSourceView = view;
+  if (tag == nil) {
+    return;
+  }
+  [_zoomTransitionSourceViews setObject:view forKey:tag];
+}
+
+- (void)unregisterZoomTransitionSourceView:(UIView *)view forTag:(nullable NSString *)tag
+{
+  if (tag == nil) {
+    return;
+  }
+  if ([_zoomTransitionSourceViews objectForKey:tag] == view) {
+    [_zoomTransitionSourceViews removeObjectForKey:tag];
+  }
+}
+
+- (nullable UIView *)zoomTransitionSourceViewForTag:(nullable NSString *)tag
+{
+  if (tag == nil) {
+    return nil;
+  }
+  return [_zoomTransitionSourceViews objectForKey:tag];
 }
 
 #pragma mark - Lifecycle Events

@@ -5,10 +5,12 @@ export interface ZoomTransitionSourceProps {
   style?: ViewProps['style'] | undefined;
 
   /**
-   * Reserved for future tag-based matching between a source and a destination.
-   * Currently ignored by the native side.
+   * Identifies this source for tag-based matching with a destination. When a screen is pushed with
+   * a `zoomTransitionSourceTag` equal to this value, the transition zooms out of this view. Lets
+   * several sources on one screen push the same destination, each zooming from its own view.
+   * Requires iOS 18+; ignored on earlier versions and other platforms.
    *
    * @platform ios
    */
-  transitionTag?: string | undefined;
+  transitionTag: string;
 }

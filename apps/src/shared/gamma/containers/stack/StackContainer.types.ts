@@ -36,7 +36,10 @@ export type StackContainerProps = {
   routeConfigs: StackRouteConfig[];
 };
 
-export type PushActionMethod = (routeName: string) => void;
+export type PushActionMethod = (
+  routeName: string,
+  options?: Partial<StackRouteOptions>,
+) => void;
 export type PopActionMethod = (routeKey: string) => void;
 export type PopCompletedActionMethod = (routeKey: string) => void;
 export type PopNativeActionMethod = (routeKey: string) => void;
@@ -80,6 +83,7 @@ type PopContainerStackNavigationEffect = {
 export type NavigationActionPush = {
   type: 'push';
   routeName: string;
+  options?: Partial<StackRouteOptions>;
   ctx: NavigationActionContext;
 };
 

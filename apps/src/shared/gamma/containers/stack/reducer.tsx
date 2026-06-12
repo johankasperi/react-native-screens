@@ -92,6 +92,9 @@ function navigationActionPushHandler(
     const newStack = stack.toSpliced(renderedRouteIndex, 1);
     const routeCopy = { ...route };
     routeCopy.activityMode = 'attached';
+    if (action.options != null) {
+      routeCopy.options = { ...route.options, ...action.options };
+    }
     return stateWithStack(state, applyPush(newStack, routeCopy));
   }
 
@@ -105,7 +108,11 @@ function navigationActionPushHandler(
     );
   }
 
-  const newRoute = createRouteFromConfig(newRouteConfig, 'attached');
+  const newRoute = createRouteFromConfig(
+    newRouteConfig,
+    'attached',
+    action.options,
+  );
   return stateWithStack(state, applyPush(state.stack, newRoute));
 }
 
@@ -275,11 +282,13 @@ function navigationActionBatchHandler(
 function createRouteFromConfig(
   config: StackRouteConfig,
   activityMode: StackScreenActivityMode = 'detached',
+  options?: Partial<StackRouteConfig['options']>,
 ): StackRoute {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { Component, ...rest } = config;
   return {
     ...rest,
+    options: { ...rest.options, ...options },
     activityMode,
     routeKey: generateRouteKeyForRouteName(config.name),
     isMarkedForDismissal: false,

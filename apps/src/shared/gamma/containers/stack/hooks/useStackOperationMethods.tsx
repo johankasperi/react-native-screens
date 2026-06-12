@@ -27,8 +27,8 @@ export function useStackOperationMethods(
   }, [routeConfigs]);
 
   const pushAction: PushActionMethod = React.useCallback(
-    (routeName: string) => {
-      dispatch({ type: 'push', routeName, ctx: actionContext });
+    (routeName: string, options?: Partial<StackRouteOptions>) => {
+      dispatch({ type: 'push', routeName, options, ctx: actionContext });
     },
     [dispatch, actionContext],
   );

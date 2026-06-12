@@ -39,15 +39,32 @@ function HomeScreen() {
   return (
     <CenteredLayoutView style={{ backgroundColor: Colors.BlueLight40 }}>
       <Text style={styles.label}>
-        Tap the box to push a screen that zooms out of it.
+        Tap a tagged box to push the same screen, zooming out of the tapped box.
       </Text>
-      <ZoomTransitionSource>
+      <ZoomTransitionSource transitionTag="red">
         <Pressable
-          style={styles.sourceBox}
-          onPress={() => navigation.push('Detail')}>
-          <Text style={styles.boxLabel}>Zoom source</Text>
+          style={[styles.sourceBox, { backgroundColor: Colors.RedDark100 }]}
+          onPress={() =>
+            navigation.push('Detail', { zoomTransitionSourceTag: 'red' })
+          }>
+          <Text style={styles.boxLabel}>Red source</Text>
         </Pressable>
       </ZoomTransitionSource>
+      <ZoomTransitionSource transitionTag="green">
+        <Pressable
+          style={[styles.sourceBox, { backgroundColor: Colors.GreenDark100 }]}
+          onPress={() =>
+            navigation.push('Detail', { zoomTransitionSourceTag: 'green' })
+          }>
+          <Text style={styles.boxLabel}>Green source</Text>
+        </Pressable>
+      </ZoomTransitionSource>
+      {/* No zoomTransitionSourceTag: pushes with the default stack transition. */}
+      <Pressable
+        style={[styles.sourceBox, { backgroundColor: Colors.PurpleDark100 }]}
+        onPress={() => navigation.push('Detail')}>
+        <Text style={styles.boxLabel}>No zoom (default push)</Text>
+      </Pressable>
     </CenteredLayoutView>
   );
 }
@@ -76,10 +93,10 @@ const styles = StyleSheet.create({
     margin: 12,
   },
   sourceBox: {
-    width: 140,
-    height: 140,
+    width: 120,
+    height: 120,
     borderRadius: 16,
-    backgroundColor: Colors.RedDark100,
+    marginVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },

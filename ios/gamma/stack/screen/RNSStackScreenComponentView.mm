@@ -59,6 +59,7 @@ namespace react = facebook::react;
   // container state
   _screenKey = nil;
   _activityMode = RNSStackScreenActivityModeDetached;
+  _zoomTransitionSourceTag = nil;
 }
 
 - (void)setupController
@@ -103,6 +104,10 @@ namespace react = facebook::react;
   if (oldComponentProps.screenKey != newComponentProps.screenKey) {
     RCTAssert(_screenKey == nil, @"[RNScreens] ScreenController cannot change its screenKey");
     _screenKey = RCTNSStringFromStringNilIfEmpty(newComponentProps.screenKey);
+  }
+
+  if (oldComponentProps.zoomTransitionSourceTag != newComponentProps.zoomTransitionSourceTag) {
+    _zoomTransitionSourceTag = RCTNSStringFromStringNilIfEmpty(newComponentProps.zoomTransitionSourceTag);
   }
 
   [super updateProps:props oldProps:oldProps];

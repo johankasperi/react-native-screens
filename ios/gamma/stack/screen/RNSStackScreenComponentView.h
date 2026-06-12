@@ -30,6 +30,12 @@ typedef NS_ENUM(int, RNSStackScreenActivityMode) {
 @property (nonatomic, strong, readonly, nullable) NSString *screenKey;
 @property (nonatomic, readonly) RNSStackScreenActivityMode activityMode;
 
+/**
+ * When this screen is pushed, the transition zooms out of the source view registered on the
+ * previous screen under a matching `transitionTag` (iOS 18+). `nil` matches an untagged source.
+ */
+@property (nonatomic, strong, readonly, nullable) NSString *zoomTransitionSourceTag;
+
 @end
 
 #pragma mark - Events

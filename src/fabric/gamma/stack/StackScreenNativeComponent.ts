@@ -35,6 +35,8 @@ export interface NativeProps extends ViewProps {
   // Configuration
 
   preventNativeDismiss?: CT.WithDefault<boolean, false>;
+
+  zoomTransitionSourceTag?: string | undefined;
 }
 
 export default codegenNativeComponent<NativeProps>('RNSStackScreen', {
